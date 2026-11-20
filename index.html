@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Show Entry Helper</title>
+<style>
+:root{color-scheme:light dark;
+--bg:light-dark(#fff,#151a18);--ink:light-dark(#333,#e4e8e6);--muted:light-dark(#777,#a3aca8);
+--line:light-dark(#ddd,#36403b);--well:light-dark(#f5f5f5,#1e2522);--green:#2c4c3d;--green2:light-dark(#4a7462,#6f9b87);
+--link:light-dark(#337ab7,#7fb3e0);--warnbg:light-dark(#fcf8e3,#3a3420);--warnink:light-dark(#8a6d3b,#e8d39a);--input:light-dark(#fff,#101412)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 "Helvetica Neue",Helvetica,Arial,sans-serif;overflow-x:clip}
+a{color:var(--link)}
+.bar{background:var(--green);color:#fff;padding:0 max(4vw,16px);height:52px;display:flex;align-items:center;font-size:18px}
+.wrap{max-width:1170px;margin:0 auto;padding:0 max(4vw,16px) 40px}
+h1{font-size:36px;font-weight:500;margin:28px 0 14px;padding-bottom:10px;border-bottom:1px solid var(--line);line-height:1.1}
+h2{font-size:26px;font-weight:500;margin:0 0 12px;line-height:1.15}
+h3{font-size:18px;font-weight:500;margin:22px 0 8px}
+.crumb{background:var(--well);border-radius:4px;padding:9px 15px;margin-bottom:20px;color:var(--muted)}
+.crumb b{color:var(--ink);font-weight:500}
+.grid{display:grid;grid-template-columns:200px minmax(0,1fr);gap:36px;align-items:start}
+.steps{border:1px solid var(--line);border-radius:4px;overflow:hidden}
+.steps button{display:block;width:100%;text-align:left;background:var(--bg);color:var(--ink);border:0;border-top:1px solid var(--line);padding:11px 15px;font:inherit;cursor:pointer;min-height:44px}
+.steps button:first-child{border-top:0}
+.steps button.on{background:var(--green);color:#fff}
+.steps button:not(.on):hover{background:var(--well)}
+.step{display:none}.step.on{display:block}
+p{margin:0 0 10px}
+.muted{color:var(--muted)}
+ul.tips{padding-left:20px;margin:0 0 12px}ul.tips li{margin-bottom:6px}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px 18px;margin-bottom:12px}
+label.f{display:block;font-weight:600;margin-bottom:4px}
+input[type=text],input[type=email],input[type=tel],select,textarea{width:100%;font:16px/1.4 inherit;font-family:inherit;padding:8px 10px;border:1px solid var(--line);border-radius:4px;background:var(--input);color:var(--ink);min-height:40px}
+textarea{min-height:80px;resize:vertical}
+input:focus,select:focus,textarea:focus,button:focus-visible{outline:2px solid var(--green2);outline-offset:1px}
+.opts{display:flex;flex-wrap:wrap;gap:6px}
+.opts label{display:flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:4px;padding:8px 12px;cursor:pointer;min-height:40px;background:var(--bg)}
+.opts input{margin:0;accent-color:var(--green)}
+.opts label:has(input:checked){border-color:var(--green2);background:var(--well)}
+.chk{display:flex;gap:8px;align-items:flex-start;margin:8px 0;cursor:pointer}.chk input{margin-top:4px;accent-color:var(--green)}
+.btn{font:inherit;border:1px solid #ccc;background:var(--bg);color:var(--ink);border-radius:4px;padding:9px 16px;cursor:pointer;min-height:42px}
+.btn:hover{background:var(--well)}
+.btn.go{background:var(--green);border-color:var(--green);color:#fff}.btn.go:hover{background:var(--green2)}
+.btn.sm{padding:5px 10px;min-height:34px;font-size:14px}
+.nav{display:flex;justify-content:space-between;gap:10px;margin-top:24px;padding-top:16px;border-top:1px solid var(--line)}
+.panel{border:1px solid var(--line);border-radius:4px;margin-bottom:16px}
+.panel>.hd{background:var(--well);border-bottom:1px solid var(--line);padding:8px 14px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.panel>.bd{padding:14px}
+.out{background:var(--well);border-radius:4px;padding:8px 12px;font-weight:600;overflow-wrap:anywhere}
+.warn{background:var(--warnbg);color:var(--warnink);border-radius:4px;padding:10px 14px;margin-bottom:14px}
+.warn ul{margin:4px 0 0;padding-left:20px}
+.hide{display:none!important}
+#mail{min-height:420px;font:14px/1.5 Menlo,Consolas,monospace}
+.acts{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+footer{border-top:1px solid var(--line);margin-top:30px;padding-top:14px;font-size:13px;color:var(--muted)}
+@media(max-width:760px){.grid{grid-template-columns:minmax(0,1fr);gap:16px}.steps{display:flex;overflow-x:auto}.steps button{border-top:0;border-left:1px solid var(--line);white-space:nowrap;flex:none;width:auto}.steps button:first-child{border-left:0}h1{font-size:28px}}
+</style>
+</head>
+<body>
+<div class="bar">Show Entry Helper</div>
+<div class="wrap">
+<h1>Entering a show</h1>
+<div class="crumb">Step <b id="stepNo">1</b> of 5: <b id="stepName">Before you enter</b></div>
+
+<div class="grid">
+<nav class="steps" id="steps">
+<button type="button" data-go="0" class="on">1. Before you enter</button>
+<button type="button" data-go="1">2. Your details</button>
+<button type="button" data-go="2">3. Your rats</button>
+<button type="button" data-go="3">4. Anything else</button>
+<button type="button" data-go="4">5. Your email</button>
+</nav>
+
+<main>
+<section class="step on" data-name="Before you enter">
+<h2>Before you enter</h2>
+<ul class="tips">
+<li>Read the show advert and check the entry deadline.</li>
+<li>Entries are by email only. Make sure yours is sent before the entry deadline on the advert.</li>
+<li>All show staff are volunteers. Show secretaries may not reply until the week of the show, and they confirm entries after the entry deadline.</li>
+</ul>
+<div class="row">
+<div><label class="f" for="sPick">Which show?</label><select id="sPick" data-p="show.pick"></select></div>
+</div>
+<div class="row hide" id="otherBox">
+<div><label class="f" for="sName">Show name</label><input type="text" id="sName" data-p="show.name" placeholder="As written on the NFRS show calendar"></div>
+<div><label class="f" for="sDate">Show date</label><input type="text" id="sDate" data-p="show.date" placeholder="e.g. Saturday 16th January 2027"></div>
+</div>
+<p class="muted" style="font-size:13px">Check the show on the <a href="https://www.nfrs.org/shows/next/">NFRS show calendar</a> for the deadline and whether it is dual entry.</p>
+<div class="row">
+<div><label class="f" for="sSec">Show secretary's name</label><input type="text" id="sSec" data-p="show.sec"></div>
+<div><label class="f" for="sMail">Show secretary's email</label><input type="email" id="sMail" data-p="show.email"></div>
+</div>
+<h3>What kind of show is it?</h3>
+<div class="opts">
+<label><input type="radio" name="stype" value="nfrs" data-p="show.type" checked> NFRS only (village hall or similar)</label>
+<label><input type="radio" name="stype" value="shared" data-p="show.type"> Shared venue (agricultural show, London or Bradford Champs)</label>
+</div>
+<p class="muted" id="typeNfrs" style="margin-top:10px">No entry fee and all guests are welcome. You do not need to contact the show secretary much before the show unless you have questions.</p>
+<div id="typeShared" class="hide" style="margin-top:10px">
+<p class="muted">There is usually an entry fee. You can sometimes get exhibitor passes by sending an SAE to the show secretary by a set date. Read the advert well before the show for any extra entry rules.</p>
+<label class="chk"><input type="checkbox" data-p="show.passes"> I want to ask about exhibitor passes</label>
+</div>
+</section>
+
+<section class="step" data-name="Your details">
+<h2>Your details</h2>
+<div class="row">
+<div><label class="f" for="mName">Your name</label><input type="text" id="mName" data-p="me.name" autocomplete="name"></div>
+<div><label class="f" for="mMob">Mobile number</label><input type="tel" id="mMob" data-p="me.mobile" autocomplete="tel"><span class="muted" style="font-size:13px">One you can answer on the show day too</span></div>
+</div>
+<div class="row"><div><label class="f" for="mMail">Email</label><input type="email" id="mMail" data-p="me.email" autocomplete="email"></div></div>
+<h3>Are you an adult or a junior?</h3>
+<div class="opts">
+<label><input type="radio" name="age" value="adult" data-p="me.age"> Adult (16 or over)</label>
+<label><input type="radio" name="age" value="junior" data-p="me.age"> Junior (under 16)</label>
+</div>
+<h3>Are you an NFRS member?</h3>
+<div class="opts">
+<label><input type="radio" name="mem" value="yes" data-p="me.member"> Yes</label>
+<label><input type="radio" name="mem" value="no" data-p="me.member"> No</label>
+</div>
+<h3>Do you have a registered stud name?</h3>
+<p class="muted">The show secretary needs this to write the cards and put your pets in the right class.</p>
+<div class="opts">
+<label><input type="radio" name="stud" value="yes" data-p="me.stud"> Yes</label>
+<label><input type="radio" name="stud" value="no" data-p="me.stud"> No</label>
+</div>
+<div id="studBox" class="hide" style="margin-top:10px;max-width:340px"><label class="f" for="mStud">Stud name</label><input type="text" id="mStud" data-p="me.studName"></div>
+</section>
+
+<section class="step" data-name="Your rats">
+<h2>Your rats</h2>
+<p class="muted">Add each rat you are bringing. If you are not sure of the class, choose "Not sure" and describe the rat in full: colour, markings, coat and ears. Use the <a href="https://www.nfrs.org/breeding_varieties.html">NFRS varieties pages</a> to check.</p>
+<div id="rats"></div>
+<button type="button" class="btn go" id="addRat">Add a rat</button>
+</section>
+
+<section class="step" data-name="Anything else">
+<h2>Anything else</h2>
+<h3>Hire a show tank?</h3>
+<p class="muted">Max 2 per exhibitor at £3 each. Bring your own substrate and moisture source.</p>
+<div class="opts">
+<label><input type="radio" name="tank" value="0" data-p="ex.tanks" checked> No</label>
+<label><input type="radio" name="tank" value="1" data-p="ex.tanks"> 1 tank</label>
+<label><input type="radio" name="tank" value="2" data-p="ex.tanks"> 2 tanks</label>
+</div>
+<h3>Other requests</h3>
+<label class="chk"><input type="checkbox" data-p="ex.buy"> I would like to buy a show tank</label>
+<div id="buyBox" class="hide" style="max-width:200px;margin:0 0 8px 24px"><label class="f" for="buyN">How many?</label><input type="text" id="buyN" data-p="ex.buyN" inputmode="numeric" value="1"></div>
+<label class="chk"><input type="checkbox" data-p="ex.transfer"> I am transferring or delivering pre-arranged rats to someone at the show</label>
+<div id="trBox" class="hide" style="margin:0 0 8px 24px"><label class="f" for="trD">Who to, and which rats?</label><textarea id="trD" data-p="ex.transferDetails"></textarea></div>
+<h3>Questions for the show secretary</h3>
+<p class="muted">Ask anything you are unsure about here, before the show day.</p>
+<textarea data-p="ex.questions" aria-label="Questions for the show secretary"></textarea>
+</section>
+
+<section class="step" data-name="Your email">
+<h2>Your email</h2>
+<div id="warns"></div>
+<p>Copy this and send it to the show secretary<span id="toWho"></span>.</p>
+<div class="acts">
+<button type="button" class="btn go" id="copyAll">Copy email</button>
+<button type="button" class="btn" id="copySubj">Copy subject only</button>
+<a class="btn" id="mailto" href="#" style="text-decoration:none">Open in my email app</a>
+</div>
+<p id="copied" class="muted" aria-live="polite"></p>
+<textarea id="mail" readonly aria-label="Your entry email"></textarea>
+<p class="muted" style="margin-top:12px">Show secretaries confirm entries after the entry deadline. If you have not had a confirmation 48 hours before the show, contact the show secretary.</p>
+<button type="button" class="btn sm" id="reset">Start a new entry</button>
+</section>
+
+<div class="nav">
+<button type="button" class="btn" id="back">Back</button>
+<button type="button" class="btn go" id="next">Next</button>
+</div>
+</main>
+</div>
+
+<footer>An unofficial helper for exhibitors, not an official NFRS page. Always follow the show advert and the <a href="https://www.nfrs.org/show_regs.html">NFRS Show Regulations</a>.</footer>
+</div>
+
+<script>
+{
+const SEC={
+self:{n:'Self',p:'Self',v:['Pink Eyed White','Champagne','Buff','Platinum','Quicksilver','British Blue','Black','Chocolate','Mink','Ivory','Lilac']},
+marked:{n:'Marked',p:'Marked',v:[['Berkshire','Berkshire/Badger'],['Badger','Berkshire/Badger'],'Irish','Hooded','Variegated','Capped','Essex',['Blazed Essex','Essex'],'Chinchilla','Squirrel',['Roan (Husky)','Roan/Striped Roan'],['Striped Roan (Banded Husky)','Roan/Striped Roan']]},
+russian:{n:'Russian',p:'Russian',v:['Russian Blue','Russian Dove','Russian Dove Agouti','Russian Blue Agouti','Russian Topaz','Russian Silver','Russian Buff']},
+shaded:{n:'Shaded',p:'Shaded',v:['Argente Crème','Cream Agouti','Himalayan','Siamese','Blue Point Siamese','Golden Siamese','Burmese','Wheaten Burmese','Golden Himalayan','Marten','Silver Agouti']},
+aov:{n:'AOV',p:'AOV',v:['Cream','Topaz','Silver Fawn','Silver','Agouti','Cinnamon','British Blue Agouti (Opal)','Lilac Agouti (Lynx)',['Pearl','Pearl/Cinnamon Pearl'],['Cinnamon Pearl','Pearl/Cinnamon Pearl'],'Platinum Agouti']},
+guide:{n:'Guide Standard',p:'Guide Standard',std:1,v:['Russian Silver Agouti','Sable Burmese','Spotted Downunder','Russian Burmese','Silken']},
+prov:{n:'Provisional Standard',p:'Provisional Standard',std:1,v:['Bareback','Blue Point Himalayan','Chestnut','Cinnamon Chinchilla','Copper','Dwarf','Merle','Powder Blue','Pink Eyed Ivory','Tonkinese','Tonkinese Agouti','Variegated Downunder']}
+};
+const SHOWS=[
+['Annual Cup Show & NFRS Xmas Show','Saturday 12th December 2026','Katie Cracknell','nfrs',1,''],
+['Banbury','Saturday 16th January 2027','Rackie Powell','nfrs',1,''],
+['Bradford Championships','Saturday 23rd January 2027','Toyah Leitch','shared',0,''],
+['Meldreth Show','Saturday 13th February 2027','Mary Giles','nfrs',1,''],
+['Woodford','Saturday 20th February 2027','Angela Corrie','nfrs',1,''],
+['Scottish Show','Saturday 6th March 2027','Kasia Zyber','nfrs',1,''],
+['Clevedon Show','Saturday 13th March 2027','Amy Foxford','nfrs',1,''],
+['Sowood Show','Saturday 20th March 2027','Charlotte Scott','nfrs',1,'']];
+const vName=x=>Array.isArray(x)?x[0]:x, vClass=x=>Array.isArray(x)?x[1]:x;
+const blank=()=>({show:{pick:'',name:'',date:'',sec:'',email:'',type:'nfrs',passes:false,noDual:false},me:{name:'',mobile:'',email:'',age:'',member:'',stud:'',studName:''},ex:{tanks:'0',buy:false,buyN:'1',transfer:false,transferDetails:'',questions:''},rats:[],step:0});
+const newRat=()=>({sex:'',age:'',enter:'',sec:'',variety:'',coat:'standard',ears:'top',extra:'',novice:''});
+let S=blank();
+try{const j=JSON.parse(localStorage.getItem('showEntryHelper')||'null');if(j)S=Object.assign(blank(),j)}catch(e){}
+if(!S.rats.length)S.rats.push(newRat());
+const save=()=>{try{localStorage.setItem('showEntryHelper',JSON.stringify(S))}catch(e){}};
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const get=p=>p.split('.').reduce((o,k)=>o[k],S);
+const set=(p,v)=>{const k=p.split('.');const last=k.pop();k.reduce((o,x)=>o[x],S)[last]=v};
+
+function fillStatic(){
+  $$('[data-p]').forEach(el=>{const v=get(el.dataset.p);
+    if(el.type==='radio')el.checked=String(v)===el.value;else if(el.type==='checkbox')el.checked=!!v;else el.value=v??''});
+}
+function toggles(){
+  $('#typeNfrs').classList.toggle('hide',S.show.type!=='nfrs');
+  $('#typeShared').classList.toggle('hide',S.show.type!=='shared');
+  $('#studBox').classList.toggle('hide',S.me.stud!=='yes');
+  $('#buyBox').classList.toggle('hide',!S.ex.buy);
+  $('#trBox').classList.toggle('hide',!S.ex.transfer);
+  $('#otherBox').classList.toggle('hide',S.show.pick!=='other');
+}
+const owner=()=>S.me.stud==='yes'?'Breeder':S.me.age==='junior'?'Junior':'Adult';
+
+function tags(r){const t=[];if(r.novice==='yes')t.push('Novice');if(r.enter==='both')t.push('Dual Entry');return t.length?' - '+t.join(' and '):''}
+function line(r){
+  const sx=r.sex==='buck'?'Buck':r.sex==='doe'?'Doe':'Buck/Doe';
+  if(r.enter==='pets')return `${owner()} Owned ${sx}`;
+  const ag=r.age==='adult'?'Adult':r.age==='kitten'?'Kitten':'Adult/Kitten';
+  const extra=r.extra.trim().toLowerCase();
+  let base,br=[];
+  if(!r.sec||r.sec==='unsure'){
+    return `${ag} ${sx} (${extra||'please describe colour, markings, coat and ears'}) - please advise class`+tags(r);
+  }
+  const s=SEC[r.sec],v=s.v.find(x=>vName(x)===r.variety);
+  const rex=r.coat==='rex',dum=r.ears==='dumbo';
+  if(extra)br.push(extra);
+  if(!v)base=s.n+' (variety not chosen)';
+  else if(rex&&dum){base='Rex Dumbo';br.push(vName(v).toLowerCase())}
+  else if(!s.std&&(rex||dum)){base=`${s.p} ${rex?'Rex':'Dumbo'}`;br.push(vName(v).toLowerCase())}
+  else{base=(s.std?s.p+' ':'')+vClass(v);if(rex)br.push('rex');if(dum)br.push('dumbo')}
+  return `${base} ${ag} ${sx}`+(br.length?` (${br.join(' ')})`:'')+tags(r);
+}
+
+function radio(i,k,opts){return `<div class="opts">${opts.map(([v,t])=>`<label><input type="radio" name="r${i}${k}" value="${v}" data-r="${k}"${S.rats[i][k]===v?' checked':''}> ${t}</label>`).join('')}</div>`}
+function ratHTML(r,i){
+  const pets=r.enter==='pets';
+  const vs=r.sec&&r.sec!=='unsure'?SEC[r.sec].v:[];
+  return `<div class="panel rat" data-i="${i}">
+<div class="hd"><strong>Rat ${i+1}</strong><span><button type="button" class="btn sm" data-act="dup">Copy this rat</button> <button type="button" class="btn sm" data-act="del"${S.rats.length<2?' disabled':''}>Remove</button></span></div>
+<div class="bd">
+<label class="f">Buck or doe?</label>${radio(i,'sex',[['buck','Buck (male)'],['doe','Doe (female)']])}
+<label class="f" style="margin-top:12px">Which classes?</label>${radio(i,'enter',[['varieties','Varieties only'],['pets','Pet show only'],['both','Varieties and pet show (dual entry)']])}
+<div class="${pets?'hide':''}"><label class="f" style="margin-top:12px">Age</label>${radio(i,'age',[['adult','Adult (14 weeks or over)'],['kitten','Kitten (8 to 14 weeks)']])}</div>
+<p class="muted ${pets?'':'hide'}" style="margin-top:8px">Age does not matter in the pet show, just buck or doe.</p>
+<div class="${pets?'hide':''}" style="margin-top:12px">
+<div class="row">
+<div><label class="f" for="sec${i}">Section</label><select id="sec${i}" data-r="sec"><option value="">Choose a section</option>${Object.entries(SEC).map(([k,s])=>`<option value="${k}"${r.sec===k?' selected':''}>${s.n}</option>`).join('')}<option value="unsure"${r.sec==='unsure'?' selected':''}>Not sure</option></select></div>
+<div class="${vs.length?'':'hide'}"><label class="f" for="var${i}">Variety</label><select id="var${i}" data-r="variety"><option value="">Choose a variety</option>${vs.map(x=>`<option${r.variety===vName(x)?' selected':''}>${esc(vName(x))}</option>`).join('')}</select></div>
+</div>
+<div class="row">
+<div><label class="f">Coat</label>${radio(i,'coat',[['standard','Standard'],['rex','Rex']])}</div>
+<div><label class="f">Ears</label>${radio(i,'ears',[['top','Top eared'],['dumbo','Dumbo']])}</div>
+</div>
+<label class="f" for="ex${i}">${r.sec==='unsure'?'Describe the rat in full':'Colour or other details (optional)'}</label>
+<input type="text" id="ex${i}" data-r="extra" value="${esc(r.extra)}" placeholder="${r.sec==='unsure'?'e.g. black irish, dumbo, standard coat':'e.g. black, agouti'}">
+<p class="muted" style="font-size:13px;margin-top:4px">Marked, rex or dumbo rats: add the colour so the full variety is clear.</p>
+</div>
+<div class="${pets?'hide':''}" style="margin-top:12px"><label class="f">Novice?</label><p class="muted" style="font-size:13px;margin:0 0 6px">Yes if you are a novice breeder and you bred this rat.</p>${radio(i,'novice',[['yes','Yes'],['no','No']])}</div>
+<p style="margin:12px 0 4px" class="muted">This rat will be entered as:</p>
+<div class="out" data-out>1x ${esc(line(r))}</div>
+</div></div>`;
+}
+function renderRats(){$('#rats').innerHTML=S.rats.map(ratHTML).join('')}
+function refreshLines(){$$('.rat').forEach(el=>{el.querySelector('[data-out]').textContent='1x '+line(S.rats[+el.dataset.i])})}
+
+function entries(){
+  const m=new Map();S.rats.forEach(r=>{const l=line(r);m.set(l,(m.get(l)||0)+1)});
+  return [...m].map(([l,n])=>`${n}x ${l}`);
+}
+function warnings(){
+  const w=[];
+  if(!S.show.name.trim())w.push('Which show (step 1)');
+  if(!S.me.name.trim())w.push('Your name (step 2)');
+  if(!S.me.mobile.trim())w.push('Mobile number (step 2)');
+  if(!S.me.email.trim())w.push('Email (step 2)');
+  if(!S.me.age)w.push('Adult or junior (step 2)');
+  if(!S.me.member)w.push('NFRS member (step 2)');
+  if(S.me.stud==='yes'&&!S.me.studName.trim())w.push('Stud name (step 2)');
+  S.rats.forEach((r,i)=>{const n=[];if(!r.sex)n.push('buck or doe');if(!r.age&&r.enter!=='pets')n.push('age');if(!r.enter)n.push('which classes');
+    if(r.enter&&r.enter!=='pets'){if(!r.sec)n.push('section');else if(r.sec==='unsure'&&!r.extra.trim())n.push('description');else if(r.sec!=='unsure'&&!r.variety)n.push('variety')}
+    if(r.enter&&r.enter!=='pets'&&!r.novice)n.push('novice yes or no');
+    if(n.length)w.push(`Rat ${i+1}: ${n.join(', ')} (step 3)`)});
+  if(S.show.noDual&&S.rats.some(r=>r.enter==='both'))w.push('This show is not dual entry. Change dual entry rats to varieties only or pets only (step 3)');
+  return w;
+}
+function subject(){return `Show entry${S.show.name.trim()?': '+S.show.name.trim():''}${S.me.name.trim()?' - '+S.me.name.trim():''}`}
+function email(){
+  const s=S.show,me=S.me,ex=S.ex,L=[];
+  L.push(`Hi ${s.sec.trim().split(' ')[0]||'Show Secretary'},`,'');
+  L.push(`Please could I enter the following rats for ${s.name.trim()||'the show'}${s.date.trim()?' on '+s.date.trim():''}.`,'');
+  L.push('MY DETAILS',`Name: ${me.name.trim()}`,`Mobile (contactable on the day): ${me.mobile.trim()}`);
+  if(me.email.trim())L.push(`Email: ${me.email.trim()}`);
+  L.push(`Adult or junior: ${me.age==='junior'?'Junior (under 16)':me.age==='adult'?'Adult':''}`);
+  L.push(`NFRS member: ${me.member==='yes'?'Yes':me.member==='no'?'No':''}`);
+  L.push(`Stud name: ${me.stud==='yes'?me.studName.trim():'None'}`);
+  L.push(`Novice breeder: ${S.rats.some(r=>r.novice==='yes'&&r.enter!=='pets')?'Yes':'No'}`,'');
+  L.push(`ENTRIES (${S.rats.length} rat${S.rats.length===1?'':'s'})`,...entries(),'');
+  const o=[];
+  if(ex.tanks!=='0')o.push(`Tank hire: ${ex.tanks} tank${ex.tanks==='1'?'':'s'} (£${ex.tanks*3}). I will bring my own substrate and moisture source.`);
+  if(ex.buy)o.push(`I would like to buy ${ex.buyN.trim()||'1'} show tank${ex.buyN.trim()==='1'||!ex.buyN.trim()?'':'s'}.`);
+  if(ex.transfer)o.push(`I am transferring pre-arranged rats at the show: ${ex.transferDetails.trim()||'details to follow'}`);
+  if(s.type==='shared'&&s.passes)o.push('Please could you let me know about exhibitor passes?');
+  L.push('OTHER REQUESTS',...(o.length?o:['None']),'');
+  if(ex.questions.trim())L.push('QUESTIONS',ex.questions.trim(),'');
+  L.push('Please could you confirm you have received my entry.','','Thanks,',me.name.trim());
+  return L.join('\n');
+}
+function renderMail(){
+  const w=warnings();
+  $('#warns').innerHTML=w.length?`<div class="warn"><strong>Still missing:</strong><ul>${w.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>`:'';
+  const to=S.show.email.trim();
+  $('#toWho').textContent=to?' at '+to:'';
+  $('#mail').value=`Subject: ${subject()}\n\n${email()}`;
+  $('#mailto').href=`mailto:${encodeURIComponent(to)}?subject=${encodeURIComponent(subject())}&body=${encodeURIComponent(email())}`;
+  $('#copied').textContent='';
+}
+function go(n){
+  S.step=Math.max(0,Math.min(4,n));
+  $$('.step').forEach((el,i)=>el.classList.toggle('on',i===S.step));
+  $$('#steps button').forEach((b,i)=>b.classList.toggle('on',i===S.step));
+  $('#stepNo').textContent=S.step+1;$('#stepName').textContent=$$('.step')[S.step].dataset.name;
+  $('#back').style.visibility=S.step?'visible':'hidden';$('#next').style.visibility=S.step<4?'visible':'hidden';
+  if(S.step===2)renderRats();
+  if(S.step===4)renderMail();
+  save();window.scrollTo({top:0});
+}
+function onField(e){
+  const el=e.target;
+  if(el.dataset.p==='show.pick'){const v=el.value;S.show.pick=v;const s=SHOWS[v];
+    if(s){S.show.name=s[0];S.show.date=s[1];S.show.sec=s[2];S.show.type=s[3];S.show.noDual=!s[4];S.show.email=s[5]||''}else{S.show.noDual=false;if(v==='other'){S.show.name='';S.show.date='';S.show.sec='';S.show.email=''}}
+    fillStatic();toggles();save();return}
+  if(el.dataset.p){set(el.dataset.p,el.type==='checkbox'?el.checked:el.value);toggles();save();return}
+  if(el.dataset.r){const card=el.closest('.rat'),i=+card.dataset.i,r=S.rats[i],k=el.dataset.r;
+    r[k]=el.type==='checkbox'?el.checked:el.value;
+    if(k==='sec'){r.variety='';save();renderRats();document.getElementById('sec'+i)?.focus();return}
+    if(k==='enter'&&e.type==='change'){save();renderRats();return}
+    refreshLines();save()}
+}
+document.addEventListener('input',e=>{const t=e.target;if(t.type!=='radio'&&t.type!=='checkbox'&&t.tagName!=='SELECT')onField(e)});
+document.addEventListener('change',e=>{if(e.target.type==='radio'||e.target.type==='checkbox'||e.target.tagName==='SELECT')onField(e)});
+$('#rats').addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b)return;const i=+b.closest('.rat').dataset.i;
+  if(b.dataset.act==='del')S.rats.splice(i,1);else S.rats.splice(i+1,0,{...S.rats[i]});save();renderRats()});
+$('#addRat').onclick=()=>{S.rats.push(newRat());save();renderRats();$$('.rat').pop().scrollIntoView({block:'start'})};
+$('#steps').onclick=e=>{const b=e.target.closest('[data-go]');if(b)go(+b.dataset.go)};
+$('#back').onclick=()=>go(S.step-1);$('#next').onclick=()=>go(S.step+1);
+async function copy(t,msg){try{await navigator.clipboard.writeText(t);$('#copied').textContent=msg}catch(e){const m=$('#mail');m.focus();m.select();$('#copied').textContent='Press Ctrl+C (or Cmd+C) to copy the selected text.'}}
+$('#copyAll').onclick=()=>copy(email(),'Email copied. Paste it into a new email and add the subject.');
+$('#copySubj').onclick=()=>copy(subject(),'Subject copied.');
+$('#reset').onclick=()=>{const keep=S.me;S=blank();S.me=keep;S.rats=[newRat()];fillStatic();toggles();go(0)};
+$('#sPick').innerHTML='<option value="">Choose a show</option>'+SHOWS.map((s,i)=>`<option value="${i}">${s[0]} (${s[1]})</option>`).join('')+'<option value="other">Another show (type it in)</option>';
+fillStatic();toggles();go(S.step||0);
+}
+</script>
+</body>
+</html>
