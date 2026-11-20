@@ -78,7 +78,8 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding-top:14px;font-si
 <h2>Before you enter</h2>
 <ul class="tips">
 <li>Read the show advert and check the entry deadline.</li>
-<li>Entries are by email only. Make sure yours is sent before the entry deadline on the advert.</li>
+<li>Entries are by email only. Contact the show secretary about a week before the show, and before the close of entries time on the advert.</li>
+<li>You can find the show secretary's contact details on the <a href="https://www.nfrs.org/shows/next/">Show Calendar</a>.</li>
 <li>All show staff are volunteers. Show secretaries may not reply until the week of the show, and they confirm entries after the entry deadline.</li>
 </ul>
 <div class="row">
@@ -108,7 +109,7 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding-top:14px;font-si
 <section class="step" data-name="Your details">
 <h2>Your details</h2>
 <div class="row">
-<div><label class="f" for="mName">Your name</label><input type="text" id="mName" data-p="me.name" autocomplete="name"></div>
+<div><label class="f" for="mName">Your name</label><input type="text" id="mName" data-p="me.name" autocomplete="name"><span class="muted" style="font-size:13px">Your own name, not your rattery name</span></div>
 <div><label class="f" for="mMob">Mobile number</label><input type="tel" id="mMob" data-p="me.mobile" autocomplete="tel"><span class="muted" style="font-size:13px">One you can answer on the show day too</span></div>
 </div>
 <div class="row"><div><label class="f" for="mMail">Email</label><input type="email" id="mMail" data-p="me.email" autocomplete="email"></div></div>
@@ -122,13 +123,13 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding-top:14px;font-si
 <label><input type="radio" name="mem" value="yes" data-p="me.member"> Yes</label>
 <label><input type="radio" name="mem" value="no" data-p="me.member"> No</label>
 </div>
-<h3>Do you have a registered stud name?</h3>
-<p class="muted">The show secretary needs this to write the cards and put your pets in the right class.</p>
+<h3>Have you claimed a stud name with the NFRS?</h3>
+<p class="muted">Only answer Yes if you have claimed your stud. If you have a rattery name but have not claimed a stud, answer No and enter under your own name. The show secretary needs this to write the cards and put your pets in the right class.</p>
 <div class="opts">
 <label><input type="radio" name="stud" value="yes" data-p="me.stud"> Yes</label>
 <label><input type="radio" name="stud" value="no" data-p="me.stud"> No</label>
 </div>
-<div id="studBox" class="hide" style="margin-top:10px;max-width:340px"><label class="f" for="mStud">Stud name</label><input type="text" id="mStud" data-p="me.studName"></div>
+<div id="studBox" class="hide" style="margin-top:10px;max-width:340px"><label class="f" for="mStud">Claimed stud name</label><input type="text" id="mStud" data-p="me.studName"></div>
 </section>
 
 <section class="step" data-name="Your rats">
@@ -141,16 +142,16 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding-top:14px;font-si
 <section class="step" data-name="Anything else">
 <h2>Anything else</h2>
 <h3>Hire a show tank?</h3>
-<p class="muted">Max 2 per exhibitor at £3 each. Bring your own substrate and moisture source.</p>
+<p class="muted">£5 each, max 2 per exhibitor. Tanks are limited. Bring your own suitable substrate, bedding material, dry food and a water bottle.</p>
 <div class="opts">
 <label><input type="radio" name="tank" value="0" data-p="ex.tanks" checked> No</label>
 <label><input type="radio" name="tank" value="1" data-p="ex.tanks"> 1 tank</label>
 <label><input type="radio" name="tank" value="2" data-p="ex.tanks"> 2 tanks</label>
 </div>
 <h3>Other requests</h3>
-<label class="chk"><input type="checkbox" data-p="ex.buy"> I would like to buy a show tank</label>
+<label class="chk"><input type="checkbox" data-p="ex.buy"> I would like to buy a show tank <span class="muted">(not available at all shows)</span></label>
 <div id="buyBox" class="hide" style="max-width:200px;margin:0 0 8px 24px"><label class="f" for="buyN">How many?</label><input type="text" id="buyN" data-p="ex.buyN" inputmode="numeric" value="1"></div>
-<label class="chk"><input type="checkbox" data-p="ex.transfer"> I am transferring or delivering pre-arranged rats to someone at the show</label>
+<label class="chk"><input type="checkbox" data-p="ex.transfer"> I am transferring or delivering pre-arranged rats to someone at the show <span class="muted">(NFRS members only)</span></label>
 <div id="trBox" class="hide" style="margin:0 0 8px 24px"><label class="f" for="trD">Who to, and which rats?</label><textarea id="trD" data-p="ex.transferDetails"></textarea></div>
 <h3>Questions for the show secretary</h3>
 <p class="muted">Ask anything you are unsure about here, before the show day.</p>
@@ -272,7 +273,7 @@ function ratHTML(r,i){
 <input type="text" id="ex${i}" data-r="extra" value="${esc(r.extra)}" placeholder="${r.sec==='unsure'?'e.g. black irish, dumbo, standard coat':'e.g. black, agouti'}">
 <p class="muted" style="font-size:13px;margin-top:4px">Marked, rex or dumbo rats: add the colour so the full variety is clear.</p>
 </div>
-<div class="${pets?'hide':''}" style="margin-top:12px"><label class="f">Novice?</label><p class="muted" style="font-size:13px;margin:0 0 6px">Yes if you are a novice breeder and you bred this rat.</p>${radio(i,'novice',[['yes','Yes'],['no','No']])}</div>
+<div class="${pets?'hide':''}" style="margin-top:12px"><label class="f">Novice?</label><p class="muted" style="font-size:13px;margin:0 0 6px">Yes if you bred this rat (eligible for the Novice award).</p>${radio(i,'novice',[['yes','Yes'],['no','No']])}</div>
 <p style="margin:12px 0 4px" class="muted">This rat will be entered as:</p>
 <div class="out" data-out>1x ${esc(line(r))}</div>
 </div></div>`;
@@ -292,11 +293,12 @@ function warnings(){
   if(!S.me.email.trim())w.push('Email (step 2)');
   if(!S.me.age)w.push('Adult or junior (step 2)');
   if(!S.me.member)w.push('NFRS member (step 2)');
-  if(S.me.stud==='yes'&&!S.me.studName.trim())w.push('Stud name (step 2)');
+  if(S.me.stud==='yes'&&!S.me.studName.trim())w.push('Claimed stud name (step 2)');
   S.rats.forEach((r,i)=>{const n=[];if(!r.sex)n.push('buck or doe');if(!r.age&&r.enter!=='pets')n.push('age');if(!r.enter)n.push('which classes');
     if(r.enter&&r.enter!=='pets'){if(!r.sec)n.push('section');else if(r.sec==='unsure'&&!r.extra.trim())n.push('description');else if(r.sec!=='unsure'&&!r.variety)n.push('variety')}
     if(r.enter&&r.enter!=='pets'&&!r.novice)n.push('novice yes or no');
     if(n.length)w.push(`Rat ${i+1}: ${n.join(', ')} (step 3)`)});
+  if(S.ex.transfer&&S.me.member!=='yes')w.push('Only NFRS members can deliver rats at NFRS shows. Untick transfers or check your membership (step 4)');
   if(S.show.noDual&&S.rats.some(r=>r.enter==='both'))w.push('This show is not dual entry. Change dual entry rats to varieties only or pets only (step 3)');
   return w;
 }
@@ -309,11 +311,11 @@ function email(){
   if(me.email.trim())L.push(`Email: ${me.email.trim()}`);
   L.push(`Adult or junior: ${me.age==='junior'?'Junior (under 16)':me.age==='adult'?'Adult':''}`);
   L.push(`NFRS member: ${me.member==='yes'?'Yes':me.member==='no'?'No':''}`);
-  L.push(`Stud name: ${me.stud==='yes'?me.studName.trim():'None'}`);
+  L.push(`Claimed stud name: ${me.stud==='yes'?me.studName.trim():'None'}`);
   L.push(`Novice breeder: ${S.rats.some(r=>r.novice==='yes'&&r.enter!=='pets')?'Yes':'No'}`,'');
   L.push(`ENTRIES (${S.rats.length} rat${S.rats.length===1?'':'s'})`,...entries(),'');
   const o=[];
-  if(ex.tanks!=='0')o.push(`Tank hire: ${ex.tanks} tank${ex.tanks==='1'?'':'s'} (£${ex.tanks*3}). I will bring my own substrate and moisture source.`);
+  if(ex.tanks!=='0')o.push(`Tank hire: ${ex.tanks} tank${ex.tanks==='1'?'':'s'} (£${ex.tanks*5}). I will bring my own substrate, bedding, dry food and a water bottle.`);
   if(ex.buy)o.push(`I would like to buy ${ex.buyN.trim()||'1'} show tank${ex.buyN.trim()==='1'||!ex.buyN.trim()?'':'s'}.`);
   if(ex.transfer)o.push(`I am transferring pre-arranged rats at the show: ${ex.transferDetails.trim()||'details to follow'}`);
   if(s.type==='shared'&&s.passes)o.push('Please could you let me know about exhibitor passes?');
